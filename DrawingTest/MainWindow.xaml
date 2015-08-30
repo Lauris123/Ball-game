@@ -25,5 +25,10 @@
                 <ImageBrush ImageSource="pack://application:,,,/resources/paddle.jpg"/>
             </Rectangle.Fill>
         </Rectangle>
+        <Rectangle Loaded="Rectangle_Loaded2" Width="200" Height="30"  Canvas.Top="500"  Canvas.Left="600">
+            <Rectangle.Fill>
+                <ImageBrush ImageSource="pack://application:,,,/resources/paddle2.png"/>
+            </Rectangle.Fill>
+        </Rectangle>
     </Canvas>
 </Window>

@@ -29,7 +29,9 @@ namespace DrawingTest
             PlayerOne = 0,
             PlayerTwo = 1
         };
-        
+
+        private event Action KādsNoRekitņiemIzsaucas;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -58,16 +60,23 @@ namespace DrawingTest
         List<Rectangle> squares = new List<Rectangle>();
 
         Rectangle rect;
+        Rectangle rect2;
 
         private void Rectangle_Loaded(object sender, RoutedEventArgs e)
         {
             rect = (Rectangle)sender;
-            LimitPlayerTurnTime();
+            KādsNoRekitņiemIzsaucas();
 
+        }
+        private void Rectangle_Loaded2(object sender, RoutedEventArgs e)
+        {
+            rect2 = (Rectangle)sender;
+            KādsNoRekitņiemIzsaucas();
+            
         }
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
+            KādsNoRekitņiemIzsaucas += FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi;
 
             ImageBrush ib = new ImageBrush();
             ib.ImageSource = new BitmapImage(new Uri("pack://application:,,,/resources/ball.png"));
@@ -91,6 +100,12 @@ namespace DrawingTest
             StartToFuckThePlayer();
             ShowTimerBrothers();
             
+        }
+
+        private void FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi()
+        {
+            if(rect != null & rect2 != null)
+                LimitPlayerTurnTime();
         }
 
         private async void ShowTimerBrothers()
@@ -264,9 +279,7 @@ namespace DrawingTest
                 int size = rnd.Next(4, 35);
 
                 squares[blockNum].Height = size;
-                squares[blockNum].Width = size;
-
-                
+                squares[blockNum].Width = size;   
             }
         }
 
@@ -277,12 +290,17 @@ namespace DrawingTest
             {
                 if (Canvas.GetLeft(rect) > this.canvas.ActualWidth / 2 - rect.Width)
                 {
-                    Canvas.SetLeft(rect, this.canvas.ActualWidth / 2 - rect.Width / 2);
+                    Canvas.SetLeft(rect, this.canvas.ActualWidth / 2 - rect.Width);
                 }
+                Canvas.SetLeft(rect2, this.canvas.ActualWidth / 2 + rect2.Width);
             }
             else
-            { 
-               //throw new NotImplementedException(); 
+            {
+                if (Canvas.GetLeft(rect2) > this.canvas.ActualWidth / 2 + rect2.Width)
+                {
+                    Canvas.SetLeft(rect2, this.canvas.ActualWidth / 2 + rect2.Width);
+                }
+                Canvas.SetLeft(rect, this.canvas.ActualWidth / 2 - rect.Width);
             }
         }
 
@@ -308,6 +326,26 @@ namespace DrawingTest
                     //imageBrush.Viewport.Left -= 200.0;
                 }
             }
+            if (e.Key == Key.A)
+            {
+                Canvas.SetLeft(rect2, Canvas.GetLeft(rect2) - 10);
+
+                if (Canvas.GetLeft(rect2) < 0)
+                {
+                    imageBrush.Viewport = new Rect(imageBrush.Viewport.X - 200, 0, 9000, 600);
+                    //imageBrush.Viewport.Left -= 200.0;
+                }
+            }
+            else if (e.Key == Key.D)
+            {
+                Canvas.SetLeft(rect2, Canvas.GetLeft(rect2) + 10);
+
+                if (Canvas.GetLeft(rect2) + rect2.Width > this.Width)
+                {
+                    imageBrush.Viewport = new Rect(imageBrush.Viewport.X + 200, 0, 9000, 600);
+                    //imageBrush.Viewport.Left -= 200.0;
+                }
+            }
             else if (e.Key == Key.Enter)
             {
                 this.Midžināt();
@@ -322,9 +360,16 @@ namespace DrawingTest
                 }
                 if(gameOver == false && Canvas.GetTop(circle) < 0)
                 {
-                    Canvas.SetTop(circle, Canvas.GetTop(rect) - rect.Height + circle.Height / 2);
-                    Canvas.SetLeft(circle, Canvas.GetLeft(rect) + rect.Width / 2 - circle.Width / 2);
-
+                    if (playerNumber == PlayerCode.PlayerOne)
+                    {
+                        Canvas.SetTop(circle, Canvas.GetTop(rect) - rect.Height + circle.Height / 2);
+                        Canvas.SetLeft(circle, Canvas.GetLeft(rect) + rect.Width / 2 - circle.Width / 2);
+                    }
+                    else
+                    {
+                        Canvas.SetTop(circle, Canvas.GetTop(rect2) - rect2.Height + circle.Height / 2);
+                        Canvas.SetLeft(circle, Canvas.GetLeft(rect2) + rect2. Width / 2 - circle.Width / 2);
+                    }
                     hasTheBallHitASquare = false;
                     isLiveTakenAway = false;
                 }
@@ -364,9 +409,6 @@ namespace DrawingTest
         
         }
 
-        private void Rectangle_Loaded2(object sender, RoutedEventArgs e)
-        {
-
-        }
+        
     }
 }
