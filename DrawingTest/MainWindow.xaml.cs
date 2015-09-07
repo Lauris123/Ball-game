@@ -23,6 +23,8 @@ namespace DrawingTest
     public partial class MainWindow : Window
     {
         const int BOTTOM_MARGIN_RECTANGLE = 200;
+        const int MAX_LIVE_COUNT = 5;
+        const int BLOCKS_IN_FIRST_LEVEL = 15;
 
         private enum PlayerCode
         {
@@ -43,16 +45,19 @@ namespace DrawingTest
         bool hasTheBallHitASquare = false;
         bool isLiveTakenAway = false;
 
-        int blocksInLevel = 15;
+        int blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
         int level = 1;
         
-        int lives = 5;
+        int lives = MAX_LIVE_COUNT;
         int score = 0;
+
+        
 
         PlayerCode playerNumber = PlayerCode.PlayerOne;
 
         DateTime startTime = DateTime.Now;
-        
+        DateTime TimerBrosStartTime = DateTime.Now;
+
         Ellipse circle;
 
 
@@ -95,6 +100,9 @@ namespace DrawingTest
 
             Canvas.SetTop(notification, this.canvas.ActualHeight / 2 - notification.ActualHeight / 2);
             
+            Canvas.SetTop(restart, this.canvas.ActualHeight / 2 - restart.ActualHeight / 2);
+            Canvas.SetLeft(restart, this.canvas.ActualWidth / 2 - restart.ActualWidth / 2);
+            
 
             StartFramerate();
             StartToFuckThePlayer();
@@ -112,7 +120,7 @@ namespace DrawingTest
         {
             while (true)
             {
-                timer.Text = (30 - (int)((DateTime.Now - Process.GetCurrentProcess().StartTime).TotalSeconds)).ToString();
+                timer.Text = (30 - (int)((DateTime.Now - TimerBrosStartTime).TotalSeconds)).ToString();
 
                 if (timer.Text == "0")
                 {
@@ -177,7 +185,7 @@ namespace DrawingTest
                             if (lives <= 0)
                             {
                                 gameOver = true;
-
+                                restart.Visibility = System.Windows.Visibility.Visible;
                                 liveCounter.Text = "0";
                                 SystemSounds.Hand.Play();
                                 MessageBox.Show("Tu pakāsi");
@@ -221,7 +229,7 @@ namespace DrawingTest
                 }
                 if (squares.Count == 0)
                 {
-                    if (level != 10)
+                    if (level != 11)
                         notification.Text = "Līmenis: " + level.ToString();
 
                     else
@@ -346,10 +354,10 @@ namespace DrawingTest
                     //imageBrush.Viewport.Left -= 200.0;
                 }
             }
-            else if (e.Key == Key.Enter)
-            {
-                this.Midžināt();
-            }
+            //else if (e.Key == Key.Enter)
+            //{
+            //    //this.Midžināt();
+            //}
             else if (e.Key == Key.Space)
             {
                 
@@ -379,23 +387,23 @@ namespace DrawingTest
                         
             } 
         }
+        // nokomentēts, jo man nestrādā.
+        //private async void Midžināt()
+        //{
+        //    return;
 
-        private async void Midžināt()
-        {
-            return;
+        //    //Velleman.Kits.K8090Board b = new Velleman.Kits.K8090Board("COM3");
+        //    //b.Connect();
+        //    //b.SwitchRelayOn(0xC0);
+        //    //b.Disconnect();
 
-            Velleman.Kits.K8090Board b = new Velleman.Kits.K8090Board("COM3");
-            b.Connect();
-            b.SwitchRelayOn(0xC0);
-            b.Disconnect();
-
-            await Task.Delay(180);
+        //    await Task.Delay(180);
 
 
-            b.Connect();
-            b.SwitchRelayOff(0xC0);
-            b.Disconnect();
-        }
+        //    //b.Connect();
+        //    //b.SwitchRelayOff(0xC0);
+        //    //b.Disconnect();
+        //}
         private async void MižinātTrīsReizes()
         {
             for (int i = 2; i != 0; i--)
@@ -403,10 +411,34 @@ namespace DrawingTest
                 await Task.Delay(500);
                 SoundPlayer sp = new SoundPlayer(Properties.Resources.boom);
                 sp.Play();
-                Midžināt();
+                //Midžināt();
             }
 
         
+        }
+
+        private void _clearTargets()
+        {
+            foreach (var square in squares)
+            {
+                canvas.Children.Remove(square);
+            }
+            squares.Clear();
+        }
+
+        private async void restart_Click(object sender, RoutedEventArgs e)
+        {
+            restart.Visibility = System.Windows.Visibility.Collapsed;
+            this._clearTargets();
+            await Task.Delay(25);
+            startTime = DateTime.Now;
+            TimerBrosStartTime = DateTime.Now;
+            blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
+            score = 0;
+            lives = MAX_LIVE_COUNT;
+            level = 1;
+            gameOver = false;
+
         }
 
         
