@@ -19,7 +19,8 @@
         <TextBlock Foreground="Blue" FontSize="45" Canvas.Right="500" x:Name="timer"/>
         <TextBlock Foreground="Cyan" FontSize="72" Canvas.Right="10" x:Name="liveCounter"/>
         <TextBlock Foreground="Pink" FontSize="45" Canvas.Right="250" x:Name="TurnTimer"/>
-        <TextBlock x:Name="notification" Panel.ZIndex="99999999" FontSize="72" Foreground="DarkRed"/>
+        <Button x:Name="restart" Foreground="Bisque" Content="Sākt No Sākuma" Background="Black" FontSize="45" Panel.ZIndex="99999999" Click="restart_Click" Visibility="Collapsed" />
+        <TextBlock x:Name="notification" Panel.ZIndex="99999998" FontSize="72" Foreground="DarkRed"/>
         <Rectangle Loaded="Rectangle_Loaded" Width="200" Height="30"  Canvas.Top="500"  Canvas.Left="10">
             <Rectangle.Fill>
                 <ImageBrush ImageSource="pack://application:,,,/resources/paddle.jpg"/>
