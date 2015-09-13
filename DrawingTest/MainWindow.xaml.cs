@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Media;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -76,6 +77,12 @@ namespace DrawingTest
         }
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            this._clientNumber = rnd.Next(1, 20000000);
+
+            this.ListenToServer();
+
+            
+
             KādsNoRekitņiemIzsaucas += FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi;
 
             ImageBrush ib = new ImageBrush();
@@ -100,6 +107,23 @@ namespace DrawingTest
             StartToFuckThePlayer();
             ShowTimerBrothers();
             
+        }
+
+        private async void ListenToServer()
+        {
+            while (true)
+            {
+                WebClient wc = new WebClient();
+
+                string s = wc.DownloadString("http://localhost:20160/spele/?client=" + this._clientNumber);
+
+                if (s == "labi")
+                {
+                    MessageBox.Show("aaa");
+                }
+
+                await Task.Delay(40);
+            }
         }
 
         private void FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi()
@@ -304,6 +328,8 @@ namespace DrawingTest
             }
         }
 
+        private int _clientNumber;
+
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Left)
@@ -318,6 +344,10 @@ namespace DrawingTest
             }
             else if (e.Key == Key.Right)
             {
+                WebClient wc = new WebClient();
+
+                wc.DownloadString("http://localhost:20160/spele/?client=" + this._clientNumber + "&msg=labi");
+
                 Canvas.SetLeft(rect, Canvas.GetLeft(rect) + 10);
 
                 if (Canvas.GetLeft(rect) + rect.Width > this.Width)
