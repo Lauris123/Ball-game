@@ -18,22 +18,50 @@ using System.Windows.Shapes;
 
 namespace DrawingTest
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        #region Constants
+
         const int BOTTOM_MARGIN_RECTANGLE = 200;
         const int MAX_LIVE_COUNT = 5;
         const int BLOCKS_IN_FIRST_LEVEL = 15;
 
-        private enum PlayerCode
-        {
-            PlayerOne = 0,
-            PlayerTwo = 1
-        };
+        #endregion
+
+        #region Private members
+
+        private int _clientNumber;
+        PlayerCode _playerNumber = PlayerCode.PlayerOne;
+
+        bool _gameOver = false;
+        bool _hasTheBallHitASquare = false;
+        bool _isLiveTakenAway = false;
+        bool _firstTime = true;
+
+        int _blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
+        int _level = 1;
+
+        int _lives = MAX_LIVE_COUNT;
+        int _score = 0;
+
+        DateTime _startTime = DateTime.Now;
+        DateTime _timerStartTime = DateTime.Now;
+
+        Ellipse _circle;
+
+        Random _rnd = new Random();
+        List<Rectangle> _squares = new List<Rectangle>();
+
+        Rectangle _rect;
+        Rectangle _rect2;
+
+        #endregion
+
+        #region Events
 
         private event Action KādsNoRekitņiemIzsaucas;
+
+        #endregion
 
         public MainWindow()
         {
@@ -42,51 +70,31 @@ namespace DrawingTest
             this.Loaded += MainWindow_Loaded;
         }
 
-        bool gameOver = false;
-        bool hasTheBallHitASquare = false;
-        bool isLiveTakenAway = false;
+        #region Private methods
 
-        int blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
-        int level = 1;
-        
-        int lives = MAX_LIVE_COUNT;
-        int score = 0;
-
-        
-
-        PlayerCode playerNumber = PlayerCode.PlayerOne;
-
-        DateTime startTime = DateTime.Now;
-        DateTime TimerBrosStartTime = DateTime.Now;
-
-        Ellipse circle;
-
-
-        Random rnd = new Random();
-        List<Rectangle> squares = new List<Rectangle>();
-
-        Rectangle rect;
-        Rectangle rect2;
+        #region Event Handlers
 
         private void Rectangle_Loaded(object sender, RoutedEventArgs e)
         {
-            rect = (Rectangle)sender;
+            _rect = (Rectangle)sender;
             KādsNoRekitņiemIzsaucas();
 
         }
+
         private void Rectangle_Loaded2(object sender, RoutedEventArgs e)
         {
-            rect2 = (Rectangle)sender;
+            _rect2 = (Rectangle)sender;
             KādsNoRekitņiemIzsaucas();
-            
+
         }
+
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            this._clientNumber = rnd.Next(1, 20000000);
+            this._clientNumber = _rnd.Next(1, 20000000);
 
             this.ListenToServer();
 
-            
+
 
             KādsNoRekitņiemIzsaucas += FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi;
 
@@ -94,27 +102,78 @@ namespace DrawingTest
             ib.ImageSource = new BitmapImage(new Uri("pack://application:,,,/resources/ball.png"));
 
 
-            liveCounter.Text = lives.ToString();
-            circle = new Ellipse();
-            circle.Fill = ib;
-            circle.Width = 20;
-            circle.Height = 20;
-            canvas.Children.Add(circle);
+            liveCounter.Text = _lives.ToString();
+            _circle = new Ellipse();
+            _circle.Fill = ib;
+            _circle.Width = 20;
+            _circle.Height = 20;
+            canvas.Children.Add(_circle);
 
-            Canvas.SetTop(circle, circle.Height-6000);
-            Canvas.SetLeft(circle, 0);
-            circle.Visibility = System.Windows.Visibility.Collapsed;
+            Canvas.SetTop(_circle, _circle.Height - 6000);
+            Canvas.SetLeft(_circle, 0);
+            _circle.Visibility = System.Windows.Visibility.Collapsed;
 
             Canvas.SetTop(notification, this.canvas.ActualHeight / 2 - notification.ActualHeight / 2);
-            
+
             Canvas.SetTop(restart, this.canvas.ActualHeight / 2 - restart.ActualHeight / 2);
             Canvas.SetLeft(restart, this.canvas.ActualWidth / 2 - restart.ActualWidth / 2);
-            
+
 
             StartFramerate();
             StartToFuckThePlayer();
             ShowTimerBrothers();
-            
+
+        }
+
+        // TODO: parsaukt XAMLā
+        private async void restart_Click(object sender, RoutedEventArgs e)
+        {
+            restart.Visibility = System.Windows.Visibility.Collapsed;
+            this.ClearTargets();
+            await Task.Delay(25);
+            _startTime = DateTime.Now;
+            _timerStartTime = DateTime.Now;
+            _blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
+            _score = 0;
+            _lives = MAX_LIVE_COUNT;
+            _level = 1;
+            _gameOver = false;
+
+        }
+
+        #endregion
+
+        #region Timed events
+
+        private async void ShowTimerBrothers()
+        {
+            while (true)
+            {
+                timer.Text = (30 - (int)((DateTime.Now - _timerStartTime).TotalSeconds)).ToString();
+
+                if (timer.Text == "0")
+                {
+                    MessageBox.Show("I sexually Identify as an Attack Helicopter. Ever since I was a boy I dreamed of soaring over the oilfields dropping hot sticky loads on disgusting foreigners. People say to me that a person being a helicopter is Impossible and I'm fucking retarded but I don't care, I'm beautiful. I'm having a plastic surgeon install rotary blades, 30 mm cannons and AMG-114 Hellfire missiles on my body. From now on I want you guys to call me Apache and respect my right to kill from above and kill needlessly. If you can't accept me you're a heliphobe and need to check your vehicle privilege. Thank you for being so understanding.");
+
+                }
+
+                await Task.Delay(500);
+            }
+        }
+
+        private async void LimitPlayerTurnTime()
+        {
+            while (true)
+            {
+                TurnTimer.Text = (5 - (int)((DateTime.Now - _startTime).TotalSeconds)).ToString();
+                if (5 - (int)((DateTime.Now - _startTime).TotalSeconds) == 0)
+                {
+                    _startTime = DateTime.Now;
+                    _playerNumber = _playerNumber == PlayerCode.PlayerOne ? PlayerCode.PlayerTwo : PlayerCode.PlayerOne;
+                }
+                LimitPlayerMovement((byte)_playerNumber);
+                await Task.Delay(10);
+            }
         }
 
         private async void ListenToServer()
@@ -134,81 +193,31 @@ namespace DrawingTest
             }
         }
 
-        private void FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi()
-        {
-            if(rect != null & rect2 != null)
-                LimitPlayerTurnTime();
-        }
-
-        private async void ShowTimerBrothers()
-        {
-            while (true)
-            {
-                timer.Text = (30 - (int)((DateTime.Now - TimerBrosStartTime).TotalSeconds)).ToString();
-
-                if (timer.Text == "0")
-                {
-                    MessageBox.Show("I sexually Identify as an Attack Helicopter. Ever since I was a boy I dreamed of soaring over the oilfields dropping hot sticky loads on disgusting foreigners. People say to me that a person being a helicopter is Impossible and I'm fucking retarded but I don't care, I'm beautiful. I'm having a plastic surgeon install rotary blades, 30 mm cannons and AMG-114 Hellfire missiles on my body. From now on I want you guys to call me Apache and respect my right to kill from above and kill needlessly. If you can't accept me you're a heliphobe and need to check your vehicle privilege. Thank you for being so understanding.");
-                    
-                }
-
-                await Task.Delay(500);
-            }
-        }
-        private async void LimitPlayerTurnTime()
-        {
-            while (true)
-            {
-                TurnTimer.Text = (5 - (int)((DateTime.Now - startTime).TotalSeconds)).ToString();
-                if (5 - (int)((DateTime.Now - startTime).TotalSeconds) == 0)
-                {
-                    startTime = DateTime.Now;
-                    playerNumber = playerNumber == PlayerCode.PlayerOne ? PlayerCode.PlayerTwo : PlayerCode.PlayerOne;
-                }
-                LimitPlayerMovement((byte)playerNumber);
-                await Task.Delay(10);
-            }
-        }
-        void CreateNewSquare()
-        {
-            Rectangle newRec = new Rectangle();
-            newRec.Fill = Brushes.Green;
-            newRec.Width = 30;
-            newRec.Height = 30;
-
-            int yPos = rnd.Next(0, (int)this.Height - BOTTOM_MARGIN_RECTANGLE);
-            Canvas.SetTop(newRec, yPos);
-            int xPos = rnd.Next(0, (int)this.Width - (int)newRec.Width);
-            Canvas.SetLeft(newRec, xPos);
-            canvas.Children.Add(newRec);
-            squares.Add(newRec);
-        }
-
         private async void StartFramerate()
         {
-            
+
             while (true)
             {
                 await Task.Delay(10); // 100fps
 
-                Canvas.SetTop(circle, Canvas.GetTop(circle) - 8);
-                Canvas.SetLeft(circle, Canvas.GetLeft(circle) + 0);
+                Canvas.SetTop(_circle, Canvas.GetTop(_circle) - 8);
+                Canvas.SetLeft(_circle, Canvas.GetLeft(_circle) + 0);
 
-                if (Canvas.GetTop(circle) < -circle.Height && !hasTheBallHitASquare)
+                if (Canvas.GetTop(_circle) < -_circle.Height && !_hasTheBallHitASquare)
                 {
-                    if (firstTime == false)
+                    if (_firstTime == false)
                     {
-                        if (isLiveTakenAway == false)
+                        if (_isLiveTakenAway == false)
                         {
 
-                            lives--;
-                            isLiveTakenAway = true;
-                            liveCounter.Text = lives.ToString();
+                            _lives--;
+                            _isLiveTakenAway = true;
+                            liveCounter.Text = _lives.ToString();
                             CreateNewSquare();
 
-                            if (lives <= 0)
+                            if (_lives <= 0)
                             {
-                                gameOver = true;
+                                _gameOver = true;
                                 restart.Visibility = System.Windows.Visibility.Visible;
                                 liveCounter.Text = "0";
                                 SystemSounds.Hand.Play();
@@ -223,11 +232,11 @@ namespace DrawingTest
                     }
                 }
 
-                var hitbox = new Rect(Canvas.GetLeft(circle), Canvas.GetTop(circle), circle.Width, circle.Height);
+                var hitbox = new Rect(Canvas.GetLeft(_circle), Canvas.GetTop(_circle), _circle.Width, _circle.Height);
 
                 List<Rectangle> removedSquares = new List<Rectangle>();
-                
-                foreach (Rectangle square in squares)
+
+                foreach (Rectangle square in _squares)
                 {
                     var candidateToTrash = new Rect(Canvas.GetLeft(square), Canvas.GetTop(square), square.Width, square.Height);
                     if (hitbox.IntersectsWith(candidateToTrash))
@@ -235,9 +244,9 @@ namespace DrawingTest
 
                         canvas.Children.Remove(square);
                         removedSquares.Add(square);
-                        score++;
-                        scoreDisplay.Text = score.ToString();
-                        hasTheBallHitASquare = true;
+                        _score++;
+                        scoreDisplay.Text = _score.ToString();
+                        _hasTheBallHitASquare = true;
 
                         SoundPlayer sp = new SoundPlayer(Properties.Resources.boom);
                         sp.Play();
@@ -249,43 +258,43 @@ namespace DrawingTest
 
                 foreach (var square in removedSquares)
                 {
-                    squares.Remove(square);
+                    _squares.Remove(square);
                 }
-                if (squares.Count == 0)
+                if (_squares.Count == 0)
                 {
-                    if (level != 11)
-                        notification.Text = "Līmenis: " + level.ToString();
+                    if (_level != 11)
+                        notification.Text = "Līmenis: " + _level.ToString();
 
                     else
                         notification.Text = "LOHS!!!!!!";
 
                     await Task.Delay(10);
                     Canvas.SetLeft(notification, this.canvas.ActualWidth / 2 - notification.ActualWidth / 2);
-                    await Task.Delay(1000); 
+                    await Task.Delay(1000);
                     notification.Text = "";
-                    if (level == 2)
+                    if (_level == 2)
                     {
-                        blocksInLevel = 10;
-                        level++;
+                        _blocksInLevel = 10;
+                        _level++;
                     }
-                    else if (level == 10)
+                    else if (_level == 10)
                     {
-                        blocksInLevel = 1;
-                        level++;
+                        _blocksInLevel = 1;
+                        _level++;
                     }
                     else
                     {
-                        if (level != 1)
+                        if (_level != 1)
                         {
-                            blocksInLevel--;
+                            _blocksInLevel--;
                         }
 
-                        level++;
+                        _level++;
                     }
 
                     StartToFuckThePlayer();
-                    
-                    for (int i = 0; i < blocksInLevel; i++)
+
+                    for (int i = 0; i < _blocksInLevel; i++)
                     {
                         CreateNewSquare();
                         await Task.Delay(100);
@@ -294,9 +303,8 @@ namespace DrawingTest
             }
 
         }
-        bool firstTime = true;
 
-        private async void StartToFuckThePlayer() 
+        private async void StartToFuckThePlayer()
         {
 
 
@@ -304,47 +312,67 @@ namespace DrawingTest
             {
                 await Task.Delay(500);
 
-                if (squares.Count == 0)
+                if (_squares.Count == 0)
                     continue;
 
-                int blockNum = rnd.Next(0, squares.Count - 1);
-                int size = rnd.Next(4, 35);
+                int blockNum = _rnd.Next(0, _squares.Count - 1);
+                int size = _rnd.Next(4, 35);
 
-                squares[blockNum].Height = size;
-                squares[blockNum].Width = size;   
+                _squares[blockNum].Height = size;
+                _squares[blockNum].Width = size;
             }
         }
 
-        //[DebuggerNonUserCode]
+        #endregion
+
+        private void FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi()
+        {
+            if(_rect != null & _rect2 != null)
+                LimitPlayerTurnTime();
+        }
+
+        private void CreateNewSquare()
+        {
+            Rectangle newRec = new Rectangle();
+            newRec.Fill = Brushes.Green;
+            newRec.Width = 30;
+            newRec.Height = 30;
+
+            int yPos = _rnd.Next(0, (int)this.Height - BOTTOM_MARGIN_RECTANGLE);
+            Canvas.SetTop(newRec, yPos);
+            int xPos = _rnd.Next(0, (int)this.Width - (int)newRec.Width);
+            Canvas.SetLeft(newRec, xPos);
+            canvas.Children.Add(newRec);
+            _squares.Add(newRec);
+        }
+
         private void LimitPlayerMovement(byte playerNumber)
         {
             if (playerNumber == (byte)PlayerCode.PlayerOne)
             {
-                if (Canvas.GetLeft(rect) > this.canvas.ActualWidth / 2 - rect.Width)
+                if (Canvas.GetLeft(_rect) > this.canvas.ActualWidth / 2 - _rect.Width)
                 {
-                    Canvas.SetLeft(rect, this.canvas.ActualWidth / 2 - rect.Width);
+                    Canvas.SetLeft(_rect, this.canvas.ActualWidth / 2 - _rect.Width);
                 }
-                Canvas.SetLeft(rect2, this.canvas.ActualWidth / 2 + rect2.Width);
+                Canvas.SetLeft(_rect2, this.canvas.ActualWidth / 2);
             }
             else
             {
-                if (Canvas.GetLeft(rect2) > this.canvas.ActualWidth / 2 + rect2.Width)
+                if (Canvas.GetLeft(_rect2) < this.canvas.ActualWidth / 2)
                 {
-                    Canvas.SetLeft(rect2, this.canvas.ActualWidth / 2 + rect2.Width);
+                    Canvas.SetLeft(_rect2, this.canvas.ActualWidth / 2 );
                 }
-                Canvas.SetLeft(rect, this.canvas.ActualWidth / 2 - rect.Width);
+                Canvas.SetLeft(_rect, this.canvas.ActualWidth / 2 - _rect.Width);
             }
         }
-
-        private int _clientNumber;
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Left)
             {
-                Canvas.SetLeft(rect, Canvas.GetLeft(rect) - 10);
+                Canvas.SetLeft(_rect, Canvas.GetLeft(_rect) - 10);
 
-                if (Canvas.GetLeft(rect) < 0)
+                if (Canvas.GetLeft(_rect) < 0)
                 {
                     imageBrush.Viewport = new Rect(imageBrush.Viewport.X - 200, 0, 9000, 600);
                     //imageBrush.Viewport.Left -= 200.0;
@@ -356,9 +384,9 @@ namespace DrawingTest
 
                 wc.DownloadString("http://localhost:20160/spele/?client=" + this._clientNumber + "&msg=labi");
 
-                Canvas.SetLeft(rect, Canvas.GetLeft(rect) + 10);
+                Canvas.SetLeft(_rect, Canvas.GetLeft(_rect) + 10);
 
-                if (Canvas.GetLeft(rect) + rect.Width > this.Width)
+                if (Canvas.GetLeft(_rect) + _rect.Width > this.Width)
                 {
                     imageBrush.Viewport = new Rect(imageBrush.Viewport.X + 200, 0, 9000, 600);
                     //imageBrush.Viewport.Left -= 200.0;
@@ -366,9 +394,9 @@ namespace DrawingTest
             }
             if (e.Key == Key.A)
             {
-                Canvas.SetLeft(rect2, Canvas.GetLeft(rect2) - 10);
+                Canvas.SetLeft(_rect2, Canvas.GetLeft(_rect2) - 10);
 
-                if (Canvas.GetLeft(rect2) < 0)
+                if (Canvas.GetLeft(_rect2) < 0)
                 {
                     imageBrush.Viewport = new Rect(imageBrush.Viewport.X - 200, 0, 9000, 600);
                     //imageBrush.Viewport.Left -= 200.0;
@@ -376,9 +404,9 @@ namespace DrawingTest
             }
             else if (e.Key == Key.D)
             {
-                Canvas.SetLeft(rect2, Canvas.GetLeft(rect2) + 10);
+                Canvas.SetLeft(_rect2, Canvas.GetLeft(_rect2) + 10);
 
-                if (Canvas.GetLeft(rect2) + rect2.Width > this.Width)
+                if (Canvas.GetLeft(_rect2) + _rect2.Width > this.Width)
                 {
                     imageBrush.Viewport = new Rect(imageBrush.Viewport.X + 200, 0, 9000, 600);
                     //imageBrush.Viewport.Left -= 200.0;
@@ -391,33 +419,34 @@ namespace DrawingTest
             else if (e.Key == Key.Space)
             {
                 
-                if (firstTime == true)
+                if (_firstTime == true)
                 {
                             
-                    circle.Visibility = System.Windows.Visibility.Visible;
+                    _circle.Visibility = System.Windows.Visibility.Visible;
                 }
-                if(gameOver == false && Canvas.GetTop(circle) < 0)
+                if(_gameOver == false && Canvas.GetTop(_circle) < 0)
                 {
-                    if (playerNumber == PlayerCode.PlayerOne)
+                    if (_playerNumber == PlayerCode.PlayerOne)
                     {
-                        Canvas.SetTop(circle, Canvas.GetTop(rect) - rect.Height + circle.Height / 2);
-                        Canvas.SetLeft(circle, Canvas.GetLeft(rect) + rect.Width / 2 - circle.Width / 2);
+                        Canvas.SetTop(_circle, Canvas.GetTop(_rect) - _rect.Height + _circle.Height / 2);
+                        Canvas.SetLeft(_circle, Canvas.GetLeft(_rect) + _rect.Width / 2 - _circle.Width / 2);
                     }
                     else
                     {
-                        Canvas.SetTop(circle, Canvas.GetTop(rect2) - rect2.Height + circle.Height / 2);
-                        Canvas.SetLeft(circle, Canvas.GetLeft(rect2) + rect2. Width / 2 - circle.Width / 2);
+                        Canvas.SetTop(_circle, Canvas.GetTop(_rect2) - _rect2.Height + _circle.Height / 2);
+                        Canvas.SetLeft(_circle, Canvas.GetLeft(_rect2) + _rect2. Width / 2 - _circle.Width / 2);
                     }
-                    hasTheBallHitASquare = false;
-                    isLiveTakenAway = false;
+                    _hasTheBallHitASquare = false;
+                    _isLiveTakenAway = false;
                 }
 
-                firstTime = false;
+                _firstTime = false;
 
                         
             } 
         }
-        // nokomentēts, jo man nestrādā.
+
+        // nokomentēts, jo nav API atbalsts
         //private async void Midžināt()
         //{
         //    return;
@@ -434,6 +463,7 @@ namespace DrawingTest
         //    //b.SwitchRelayOff(0xC0);
         //    //b.Disconnect();
         //}
+
         private async void MižinātTrīsReizes()
         {
             for (int i = 2; i != 0; i--)
@@ -447,30 +477,25 @@ namespace DrawingTest
         
         }
 
-        private void _clearTargets()
+        private void ClearTargets()
         {
-            foreach (var square in squares)
+            foreach (var square in _squares)
             {
                 canvas.Children.Remove(square);
             }
-            squares.Clear();
+            _squares.Clear();
         }
 
-        private async void restart_Click(object sender, RoutedEventArgs e)
+        #endregion
+
+        #region Enums
+
+        private enum PlayerCode
         {
-            restart.Visibility = System.Windows.Visibility.Collapsed;
-            this._clearTargets();
-            await Task.Delay(25);
-            startTime = DateTime.Now;
-            TimerBrosStartTime = DateTime.Now;
-            blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
-            score = 0;
-            lives = MAX_LIVE_COUNT;
-            level = 1;
-            gameOver = false;
+            PlayerOne = 0,
+            PlayerTwo = 1
+        };
 
-        }
-
-        
+        #endregion
     }
 }
