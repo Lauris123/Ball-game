@@ -498,6 +498,7 @@ namespace DrawingTest
 
         #endregion
 
+        // TODO: japabeidz menu
         private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Canvas.SetLeft((Grid)sender, (canvas.ActualWidth - ((Grid)sender).ActualWidth) / 2);
