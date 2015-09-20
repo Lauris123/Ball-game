@@ -20,7 +20,7 @@
         <TextBlock Foreground="Cyan" FontSize="72" Canvas.Right="10" x:Name="liveCounter"/>
         <TextBlock Foreground="Pink" FontSize="45" Canvas.Right="250" x:Name="TurnTimer"/>
         <Button x:Name="restart" Foreground="Bisque" Content="Sākt No Sākuma" Background="Black" FontSize="45" Panel.ZIndex="99999999" Click="restart_Click" Visibility="Collapsed" />
-        <TextBlock x:Name="notification" Panel.ZIndex="99999998" FontSize="72" Foreground="DarkRed"/>
+        <TextBlock x:Name="notification" Panel.ZIndex="99999" FontSize="72" Foreground="DarkRed"/>
         <Rectangle Loaded="Rectangle_Loaded" Width="200" Height="30"  Canvas.Top="500"  Canvas.Left="10">
             <Rectangle.Fill>
                 <ImageBrush ImageSource="pack://application:,,,/resources/paddle.jpg"/>
@@ -31,5 +31,24 @@
                 <ImageBrush ImageSource="pack://application:,,,/resources/paddle2.png"/>
             </Rectangle.Fill>
         </Rectangle>
+        <Grid SizeChanged="Grid_SizeChanged">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.Style>
+                <Style>
+                <Setter Property="TextBlock.FontSize" Value="36" />
+                </Style>
+            </Grid.Style>
+            <Button>Iziet spēli ar maisiņu</Button>
+            <Button Grid.Row="1">Iziet no spēles bez tīkla</Button>
+            <Button Grid.Row="2">Iziet spēli ar tīkliņu</Button>
+            <Button Grid.Row="3">Iziet spēli ar tīklu</Button>
+            
+        </Grid>
     </Canvas>
+    
 </Window>

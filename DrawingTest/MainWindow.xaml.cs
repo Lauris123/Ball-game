@@ -497,5 +497,11 @@ namespace DrawingTest
         };
 
         #endregion
+
+        private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Canvas.SetLeft((Grid)sender, (canvas.ActualWidth - ((Grid)sender).ActualWidth) / 2);
+            Canvas.SetTop((Grid)sender, (canvas.ActualHeight - ((Grid)sender).ActualHeight) / 2);
+        }
     }
 }
