@@ -10,7 +10,7 @@
                 x:Name="imageBrush"  
                   ImageSource="pack://application:,,,/resources/surface.jpg"
                   Viewport="0,0,9000,600" ViewportUnits="Absolute"
-                  TileMode="None" />
+                  TileMode="Tile" />
 
         </Canvas.Background>
         <Rectangle Width="800" Height="600">
