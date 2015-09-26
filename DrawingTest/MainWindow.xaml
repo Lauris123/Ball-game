@@ -31,7 +31,7 @@
                 <ImageBrush ImageSource="pack://application:,,,/resources/paddle2.png"/>
             </Rectangle.Fill>
         </Rectangle>
-        <Grid SizeChanged="Grid_SizeChanged">
+        <Grid SizeChanged="Grid_SizeChanged" x:Name="menuGrid">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -43,10 +43,16 @@
                 <Setter Property="TextBlock.FontSize" Value="36" />
                 </Style>
             </Grid.Style>
-            <Button>Iziet spēli ar maisiņu</Button>
-            <Button Grid.Row="1">Iziet no spēles bez tīkla</Button>
-            <Button Grid.Row="2">Iziet spēli ar tīkliņu</Button>
-            <Button Grid.Row="3">Iziet spēli ar tīklu</Button>
+            <Border BorderBrush="AliceBlue" BorderThickness="8">
+                <StackPanel>
+                    <TextBlock Background="Wheat">Server address:</TextBlock>
+                    <TextBox Text="127.0.0.1:20150"></TextBox>
+                    <Button Click="StartNewGame">Sākt spēli ar multiplayer un tīklu</Button>
+                </StackPanel>
+            </Border>
+            <Button Grid.Row="1" IsEnabled="False">Sākt spēli ar multiplayer</Button>
+            <Button Grid.Row="2" IsEnabled="False">Sākt spēli kā vienam spēlētjam</Button>
+            <Button Grid.Row="3" Click="ExitGame">Iziet</Button>
             
         </Grid>
     </Canvas>

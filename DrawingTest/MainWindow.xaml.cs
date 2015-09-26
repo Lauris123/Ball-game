@@ -67,7 +67,7 @@ namespace DrawingTest
         {
             InitializeComponent();
 
-            this.Loaded += MainWindow_Loaded;
+            //this.Loaded += MainWindow_Loaded;
         }
 
         #region Private methods
@@ -77,24 +77,20 @@ namespace DrawingTest
         private void Rectangle_Loaded(object sender, RoutedEventArgs e)
         {
             _rect = (Rectangle)sender;
-            KādsNoRekitņiemIzsaucas();
 
         }
 
         private void Rectangle_Loaded2(object sender, RoutedEventArgs e)
         {
+
             _rect2 = (Rectangle)sender;
-            KādsNoRekitņiemIzsaucas();
 
         }
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             this._clientNumber = _rnd.Next(1, 20000000);
-
             this.ListenToServer();
-
-
 
             KādsNoRekitņiemIzsaucas += FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi;
 
@@ -122,7 +118,7 @@ namespace DrawingTest
             StartFramerate();
             StartToFuckThePlayer();
             ShowTimerBrothers();
-
+            KādsNoRekitņiemIzsaucas();
         }
 
         // TODO: parsaukt XAMLā
@@ -503,6 +499,17 @@ namespace DrawingTest
         {
             Canvas.SetLeft((Grid)sender, (canvas.ActualWidth - ((Grid)sender).ActualWidth) / 2);
             Canvas.SetTop((Grid)sender, (canvas.ActualHeight - ((Grid)sender).ActualHeight) / 2);
+        }
+
+        private void ExitGame(object sender, RoutedEventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
+        private void StartNewGame(object sender, RoutedEventArgs e)
+        {
+            MainWindow_Loaded(null, null);
+            menuGrid.Visibility = System.Windows.Visibility.Collapsed;
         }
     }
 }
