@@ -45,6 +45,7 @@ namespace DrawingTest
         bool _hasTheBallHitASquare = false;
         bool _isLiveTakenAway = false;
         bool _firstTime = true;
+        bool _areWeOnline = true;
 
         int _blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
         int _level = 1;
@@ -97,9 +98,11 @@ namespace DrawingTest
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            this._clientNumber = _rnd.Next(1, 20000000);
-            this.ListenToServer();
-
+            if (sender == null)
+            {
+                this._clientNumber = _rnd.Next(1, 20000000);
+                this.ListenToServer();
+            }
             KādsNoRekitņiemIzsaucas += FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi;
 
             ImageBrush ib = new ImageBrush();
@@ -385,9 +388,10 @@ namespace DrawingTest
             else if (e.Key == Key.Right)
             {
                 WebClient wc = new WebClient();
-
-                wc.DownloadString("http://localhost:20160/spele/?client=" + this._clientNumber + "&msg=labi");
-
+                if (this._areWeOnline == true)
+                {
+                    wc.DownloadString("http://localhost:20160/spele/?client=" + this._clientNumber + "&msg=labi");
+                }
                 Canvas.SetLeft(_rect, Canvas.GetLeft(_rect) + 10);
 
                 if (Canvas.GetLeft(_rect) + _rect.Width > this.Width)
@@ -518,6 +522,12 @@ namespace DrawingTest
         {
             MainWindow_Loaded(null, null);
             menuGrid.Visibility = System.Windows.Visibility.Collapsed;
+        }
+        private void MultiOffline(object sender, RoutedEventArgs e)
+        {
+            MainWindow_Loaded(sender, null);
+            menuGrid.Visibility = System.Windows.Visibility.Collapsed;
+            this._areWeOnline = false;
         }
     }
 }

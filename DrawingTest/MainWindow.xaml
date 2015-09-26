@@ -50,7 +50,7 @@
                     <Button Click="StartNewGame">Sākt spēli ar multiplayer un tīklu</Button>
                 </StackPanel>
             </Border>
-            <Button Grid.Row="1" IsEnabled="False">Sākt spēli ar multiplayer</Button>
+            <Button Grid.Row="1" IsEnabled="True" Click="MultiOffline">Sākt spēli ar multiplayer</Button>
             <Button Grid.Row="2" IsEnabled="False">Sākt spēli kā vienam spēlētjam</Button>
             <Button Grid.Row="3" Click="ExitGame">Iziet</Button>
             
