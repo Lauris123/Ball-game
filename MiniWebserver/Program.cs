@@ -10,114 +10,13 @@ namespace MiniWebserver
 {
     class Program
     {
-        #region Constants
-
-        private const string EMPTY_VALUE = "nop";
-        private const int MAX_PLAYER_COUNT = 2;
-
-        private const string PROTOCOL_GAME_START = "start"; // TODO: kurš spēlētājs tu esi (labais|kreisais)
-
-        #endregion
-
-        #region Members
-
-
-        private static int _playersConnected = 0;
-
-        // klienta nosaukums - datu rinda
-        private static Dictionary<string, Queue<string>> _clientQueues = new Dictionary<string, Queue<string>>();
-
-        #endregion
-
-        #region Events
-
-        private static event EventHandler PlayerConnected;
-
-        #endregion
-
+        
         static void Main(string[] args)
         {
-            PlayerConnected += PlayerConnected_Recieved;
-
-            WebServer ws = new WebServer(SendResponse, "http://localhost:20160/spele/");
-            ws.Run();
-            Console.WriteLine("A simple webserver. Press a key to quit.");
-            Console.ReadKey();
-            ws.Stop();
+            WebServerComponent wsc = new WebServerComponent();
+            wsc.RunUntilStoped();
+            wsc.Stop();
         }
-
-        #region Private methods
-
-
-        internal static void PlayerConnected_Recieved(object sender, EventArgs e)
-        {
-            _playersConnected++;
-
-            if (_playersConnected == MAX_PLAYER_COUNT)
-            {
-                foreach(KeyValuePair<string, Queue<string>> item in _clientQueues)
-                {
-                    item.Value.Enqueue(PROTOCOL_GAME_START);
-                }
-            }
-        }
-
-
-        #endregion
-
-        #region Public methods
-
-        public static string SendResponse(HttpListenerRequest request)
-        {
-            // NOTIKUMS: http://localhost:20160/spele/ ?client=[skaitlis]&msg=[msg]
-            // VAICĀJUMS: http://localhost:20160/spele/ ?client=[skaitlis]
-
-            // atrod kurš klients ar klienta numuru
-            string sender = request.QueryString["client"];
-
-            // vai ir atsūtīta ziņā
-            if (request.QueryString.AllKeys.Contains("msg"))
-            {
-                // KĀDS KLIENTS NOSŪTIJA KĀDU NOTIKUMU
-
-                // ir pienācis jauns ziņojums, tas ir jaieliek visu citu izņemot šī sūtītajā datu rindā
-
-                foreach (KeyValuePair<string, Queue<string>> item in _clientQueues)
-                {
-                    if (item.Key != sender)
-                    {
-                        // pievienojam jaunu klucītī
-                        item.Value.Enqueue(request.QueryString["msg"]);
-                    }
-                }
-            }
-            else // KĀDS KLIENTS PAJAUTĀJA KAS JAUNS?
-            {
-                // pārbaudam vai šīs jautātājs ir jau piereģistrēts
-                if (_clientQueues.ContainsKey(sender))
-                {
-                    // cik daudz kluči kuri nav sūtīt, ja ir lielāks par nulli
-                    if (_clientQueues[sender].Count() > 0)
-                    {
-                        // izņem no rindas pirmo kluci
-                        return _clientQueues[sender].Dequeue();
-                    }
-                }
-                else
-                {
-                    // pievieno jaunu dirsēju
-                    if (_playersConnected < MAX_PLAYER_COUNT)
-                    {
-                        _clientQueues[sender] = new Queue<string>();
-                        PlayerConnected.Invoke(null, null);
-                    }
-                }
-            }
-
-            return EMPTY_VALUE;
-        }
-
-        #endregion
 
     }
 

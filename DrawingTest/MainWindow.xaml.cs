@@ -26,6 +26,14 @@ namespace DrawingTest
         const int MAX_LIVE_COUNT = 5;
         const int BLOCKS_IN_FIRST_LEVEL = 15;
 
+        private string EMPTY_VALUE
+        {
+            get
+            {
+                return BallGame.Common.Constants.EMPTY_VALUE;
+            }
+        }
+
         #endregion
 
         #region Private members

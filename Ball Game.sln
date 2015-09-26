@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ball game", "DrawingTest\Ba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniWebserver", "MiniWebserver\MiniWebserver.csproj", "{097E7856-4EB5-48CC-9938-D4C6157BC920}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallGameWebserver.Tests", "BallGameWebserver.Tests\BallGameWebserver.Tests.csproj", "{73D3EC43-9F30-499A-AA14-C496F6A9B291}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallGame.Common", "BallGame.Common\BallGame.Common.csproj", "{59B5293F-17B5-45A2-9191-9E22067251EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{097E7856-4EB5-48CC-9938-D4C6157BC920}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{097E7856-4EB5-48CC-9938-D4C6157BC920}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{097E7856-4EB5-48CC-9938-D4C6157BC920}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73D3EC43-9F30-499A-AA14-C496F6A9B291}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73D3EC43-9F30-499A-AA14-C496F6A9B291}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73D3EC43-9F30-499A-AA14-C496F6A9B291}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73D3EC43-9F30-499A-AA14-C496F6A9B291}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59B5293F-17B5-45A2-9191-9E22067251EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59B5293F-17B5-45A2-9191-9E22067251EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59B5293F-17B5-45A2-9191-9E22067251EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59B5293F-17B5-45A2-9191-9E22067251EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
