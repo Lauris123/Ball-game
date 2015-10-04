@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Media;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -357,19 +358,19 @@ namespace DrawingTest
         {
             if (playerNumber == (byte)PlayerCode.PlayerOne)
             {
-                if (Canvas.GetLeft(_rect) > this.canvas.ActualWidth / 2 - _rect.Width)
+                if (Canvas.GetLeft(_rect) > this.canvas.ActualWidth / 2 - _rect.Width/2)
                 {
-                    Canvas.SetLeft(_rect, this.canvas.ActualWidth / 2 - _rect.Width);
+                    Canvas.SetLeft(_rect, this.canvas.ActualWidth / 2 - _rect.Width/2);
                 }
-                Canvas.SetLeft(_rect2, this.canvas.ActualWidth / 2);
+                Canvas.SetLeft(_rect2, this.canvas.ActualWidth / 2 - _rect.Width / 2);
             }
             else
             {
-                if (Canvas.GetLeft(_rect2) < this.canvas.ActualWidth / 2)
+                if (Canvas.GetLeft(_rect2) < this.canvas.ActualWidth / 2 - _rect.Width/2)
                 {
-                    Canvas.SetLeft(_rect2, this.canvas.ActualWidth / 2 );
+                    Canvas.SetLeft(_rect2, this.canvas.ActualWidth / 2 - _rect.Width / 2);
                 }
-                Canvas.SetLeft(_rect, this.canvas.ActualWidth / 2 - _rect.Width);
+                Canvas.SetLeft(_rect, this.canvas.ActualWidth / 2 - _rect.Width/2);
             }
         }
 
@@ -474,12 +475,16 @@ namespace DrawingTest
 
         private async void MižinātTrīsReizes()
         {
-            for (int i = 2; i != 0; i--)
+            for (int i = 7; i != 0; i--)
+
             {
-                await Task.Delay(500);
+                await Task.Delay(200);
                 SoundPlayer sp = new SoundPlayer(Properties.Resources.boom);
                 sp.Play();
                 //Midžināt();
+                SetScrollLockKey(true);
+                await Task.Delay(200);
+                SetScrollLockKey(false);
             }
 
         
@@ -503,8 +508,42 @@ namespace DrawingTest
             PlayerOne = 0,
             PlayerTwo = 1
         };
+        private enum GameMode
+        { 
+            MultiOnline = 0,
+            MultiOffiline = 1,
+            Single = 2
+
+        };
 
         #endregion
+
+        
+
+
+        private const byte VK_SCROLL = 0x91;
+        private const uint KEYEVENTF_KEYUP = 0x2;
+
+        [DllImport("user32.dll", EntryPoint="keybd_event", SetLastError=true)]
+        static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
+
+        [DllImport("user32.dll", EntryPoint = "GetKeyState", SetLastError = true)]
+        static extern short GetKeyState(uint nVirtKey);
+
+        public static void SetScrollLockKey(bool newState)
+        {
+            bool scrollLockSet = GetKeyState(VK_SCROLL) != 0;
+            if (scrollLockSet != newState)
+            {
+                keybd_event(VK_SCROLL, 0, 0, 0);
+                keybd_event(VK_SCROLL, 0, KEYEVENTF_KEYUP, 0);
+            }
+        }
+
+        public static bool GetScrollLockState() // true = set, false = not set
+        {
+            return GetKeyState(VK_SCROLL) != 0;
+        }
 
         // TODO: japabeidz menu
         private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
