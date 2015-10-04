@@ -10,6 +10,7 @@ namespace BallGameWebserver.Tests
     [TestClass]
     public class ProtocolTests
     {
+
         /// <summary>
         /// Pieslēgs vienu vienīgu jaunu spēlētāju un paprasīs kas jauns,
         /// serveris atgriezīs nop
@@ -17,40 +18,38 @@ namespace BallGameWebserver.Tests
         [TestMethod]
         public void ConnectSingleClientCheckReturnData()
         {
-            bool isAborted = false;
-
-            WebServerComponent server = FakeServerHelper.CreateFakeWebServer();
-
-            // sūtīsim ar WebClient tur datus un pārbaudīsim atbildes
-
-            //Thread t1 = new Thread(new ThreadStart(() =>
-            //{
-                //server.RunUntilStoped();
-            //}));
-
-            Task.Run(() =>
-            {
+            TestHelper.RunWithWebserver(() => {
                 var wc = new WebClient();
 
                 string s = wc.DownloadString("http://localhost:20160/spele/?client=1");
 
                 Assert.AreEqual(s, "nop");
-
-                isAborted = true;
             });
-
-            //t1.Start();
-
-            while (!isAborted)
-            {
-                Thread.Sleep(200);
-            }
-
-           // t1.Abort();
-
-            server.Stop();
         }
 
+        /// <summary>
+        /// Pieslēdz divus klients
+        /// </summary>
+        [TestMethod]
+        public void ConnectTwoClients()
+        {
+            TestHelper.RunWithWebserver(() =>
+            {
+                var firstClient = new WebClient();
+                var secondClient = new WebClient();
 
+                string firstReply = firstClient.DownloadString("http://localhost:20160/spele/?client=1");
+                string secondReply = secondClient.DownloadString("http://localhost:20160/spele/?client=2");
+
+                Assert.AreEqual(firstReply, "nop");
+                Assert.AreEqual(secondReply, "nop");
+
+                firstReply = firstClient.DownloadString("http://localhost:20160/spele/?client=1");
+                secondReply = secondClient.DownloadString("http://localhost:20160/spele/?client=2");
+
+                Assert.AreEqual(firstReply, WebServerComponent.PROTOCOL_GAME_START);
+                Assert.AreEqual(secondReply, WebServerComponent.PROTOCOL_GAME_START);
+            });
+        }
     }
 }

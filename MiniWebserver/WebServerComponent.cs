@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MiniWebserver
@@ -13,7 +14,7 @@ namespace MiniWebserver
 
         private const int MAX_PLAYER_COUNT = 2;
 
-        private const string PROTOCOL_GAME_START = "start"; // TODO: kurš spēlētājs tu esi (labais|kreisais)
+        public const string PROTOCOL_GAME_START = "start"; // TODO: kurš spēlētājs tu esi (labais|kreisais)
 
         private static string EMPTY_VALUE
         {
@@ -28,6 +29,8 @@ namespace MiniWebserver
         #region Members
 
         static WebServer _ws;
+
+        private bool _isAborted = false;
 
         private int _playersConnected = 0;
 
@@ -132,6 +135,21 @@ namespace MiniWebserver
         public void Stop()
         {
             _ws.Stop();
+        }
+
+        public void RequestAbort()
+        {
+            this._isAborted = true;
+        }
+
+        public void WaitForAbort()
+        {
+            while (!this._isAborted)
+            {
+                Thread.Sleep(200);
+            }
+
+            this.Stop();
         }
 
         #endregion
