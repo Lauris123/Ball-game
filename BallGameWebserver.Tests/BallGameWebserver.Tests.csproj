@@ -56,6 +56,10 @@
     <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BallGame.Common\BallGame.Common.csproj">
+      <Project>{59b5293f-17b5-45a2-9191-9e22067251ee}</Project>
+      <Name>BallGame.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MiniWebserver\MiniWebserver.csproj">
       <Project>{097e7856-4eb5-48cc-9938-d4c6157bc920}</Project>
       <Name>MiniWebserver</Name>

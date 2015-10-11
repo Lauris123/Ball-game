@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BallGame.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -13,8 +14,6 @@ namespace MiniWebserver
         #region Constants
 
         private const int MAX_PLAYER_COUNT = 2;
-
-        public const string PROTOCOL_GAME_START = "start"; // TODO: kurš spēlētājs tu esi (labais|kreisais)
 
         private static string EMPTY_VALUE
         {
@@ -68,7 +67,7 @@ namespace MiniWebserver
             {
                 foreach (KeyValuePair<string, Queue<string>> item in _clientQueues)
                 {
-                    item.Value.Enqueue(PROTOCOL_GAME_START);
+                    item.Value.Enqueue(Constants.PROTOCOL_GAME_START);
                 }
             }
         }

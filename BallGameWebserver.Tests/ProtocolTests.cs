@@ -4,6 +4,7 @@ using MiniWebserver;
 using System.Threading.Tasks;
 using System.Net;
 using System.Threading;
+using BallGame.Common;
 
 namespace BallGameWebserver.Tests
 {
@@ -19,11 +20,28 @@ namespace BallGameWebserver.Tests
         public void ConnectSingleClientCheckReturnData()
         {
             TestHelper.RunWithWebserver(() => {
-                var wc = new WebClient();
+                bool isAborted = false;
 
-                string s = wc.DownloadString("http://localhost:20160/spele/?client=1");
+                //var wc = new WebClient();
 
-                Assert.AreEqual(s, "nop");
+                //string s = wc.DownloadString("http://localhost:20160/spele/?client=1");
+
+                //Assert.AreEqual(s, "nop");
+
+                var comp = new ClientComponent();
+
+                comp.RecievedEmpty += () => {
+                    isAborted = true;
+
+                    return;
+                };
+
+                comp.Connect();
+
+                while (!isAborted)
+                {
+                    Thread.Sleep(50);
+                }
             });
         }
 
@@ -47,8 +65,8 @@ namespace BallGameWebserver.Tests
                 firstReply = firstClient.DownloadString("http://localhost:20160/spele/?client=1");
                 secondReply = secondClient.DownloadString("http://localhost:20160/spele/?client=2");
 
-                Assert.AreEqual(firstReply, WebServerComponent.PROTOCOL_GAME_START);
-                Assert.AreEqual(secondReply, WebServerComponent.PROTOCOL_GAME_START);
+                Assert.AreEqual(firstReply, Constants.PROTOCOL_GAME_START);
+                Assert.AreEqual(secondReply, Constants.PROTOCOL_GAME_START);
             });
         }
     }
