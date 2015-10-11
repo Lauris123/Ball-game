@@ -97,14 +97,17 @@ namespace DrawingTest
 
         }
 
-        void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        void MainWindow_Loaded(object sender, RoutedEventArgs e, bool secondTime = false)
         {
             if (sender == null)
             {
                 this._clientNumber = _rnd.Next(1, 20000000);
                 this.ListenToServer();
             }
-            KādsNoRekitņiemIzsaucas += FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi;
+            if (!secondTime)
+            {
+                KādsNoRekitņiemIzsaucas += FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi;
+            }
 
             ImageBrush ib = new ImageBrush();
             ib.ImageSource = new BitmapImage(new Uri("pack://application:,,,/resources/ball.png"));
@@ -126,11 +129,14 @@ namespace DrawingTest
             Canvas.SetTop(restart, this.canvas.ActualHeight / 2 - restart.ActualHeight / 2);
             Canvas.SetLeft(restart, this.canvas.ActualWidth / 2 - restart.ActualWidth / 2);
 
-
-            StartFramerate();
-            StartToFuckThePlayer();
-            ShowTimerBrothers();
-            KādsNoRekitņiemIzsaucas();
+            _startTime = DateTime.Now;
+            if (!secondTime)
+            {
+                StartFramerate();
+                StartToFuckThePlayer();
+                ShowTimerBrothers();
+                KādsNoRekitņiemIzsaucas();
+            }
         }
 
         // TODO: parsaukt XAMLā
@@ -141,11 +147,12 @@ namespace DrawingTest
             await Task.Delay(25);
             _startTime = DateTime.Now;
             _timerStartTime = DateTime.Now;
-            _blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
             _score = 0;
             _lives = MAX_LIVE_COUNT;
             _level = 1;
             _gameOver = false;
+            _blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
+            MainWindow_Loaded(sender, null, true);
 
         }
 
@@ -171,8 +178,10 @@ namespace DrawingTest
 
         private async void LimitPlayerTurnTime()
         {
+            
             while (true)
             {
+                
                 TurnTimer.Text = (5 - (int)((DateTime.Now - _startTime).TotalSeconds)).ToString();
                 if (5 - (int)((DateTime.Now - _startTime).TotalSeconds) == 0)
                 {
@@ -297,6 +306,7 @@ namespace DrawingTest
                             _blocksInLevel--;
                         }
 
+                        
                         _level++;
                     }
 
@@ -305,7 +315,6 @@ namespace DrawingTest
                     for (int i = 0; i < _blocksInLevel; i++)
                     {
                         CreateNewSquare();
-                        await Task.Delay(100);
                     }
                 }
             }
@@ -332,7 +341,7 @@ namespace DrawingTest
         }
 
         #endregion
-
+        
         private void FunkcijaKuraDarbosiesTIkaiJaAbiRektiņi()
         {
             if(_rect != null & _rect2 != null)
@@ -358,19 +367,25 @@ namespace DrawingTest
         {
             if (playerNumber == (byte)PlayerCode.PlayerOne)
             {
+                _rect.Visibility = System.Windows.Visibility.Visible;
                 if (Canvas.GetLeft(_rect) > this.canvas.ActualWidth / 2 - _rect.Width/2)
                 {
+                   
                     Canvas.SetLeft(_rect, this.canvas.ActualWidth / 2 - _rect.Width/2);
                 }
                 Canvas.SetLeft(_rect2, this.canvas.ActualWidth / 2 - _rect.Width / 2);
+                _rect2.Visibility = System.Windows.Visibility.Hidden;
             }
             else
             {
+                _rect2.Visibility = System.Windows.Visibility.Visible;
                 if (Canvas.GetLeft(_rect2) < this.canvas.ActualWidth / 2 - _rect.Width/2)
                 {
                     Canvas.SetLeft(_rect2, this.canvas.ActualWidth / 2 - _rect.Width / 2);
+
                 }
                 Canvas.SetLeft(_rect, this.canvas.ActualWidth / 2 - _rect.Width/2);
+                _rect.Visibility = System.Windows.Visibility.Hidden;
             }
         }
 
@@ -567,6 +582,7 @@ namespace DrawingTest
             MainWindow_Loaded(sender, null);
             menuGrid.Visibility = System.Windows.Visibility.Collapsed;
             this._areWeOnline = false;
+            
         }
     }
 }
