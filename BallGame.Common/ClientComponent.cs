@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BallGame.Common
@@ -13,12 +14,16 @@ namespace BallGame.Common
 
         private readonly string _requestPath;
 
-        private WebClient _wc;
+        private WebClient _wcOut;
+
+        private WebClient _wcIn;
+
+        private static Random rnd = new Random();
 
         public ClientComponent()
         {
-            this._wc = new WebClient();
-            Random rnd = new Random();
+            this._wcIn = new WebClient();
+            this._wcOut = new WebClient();
             int num = rnd.Next(1, 2000000);
             this._requestPath = SERVER + "?client=" + num;
         }
@@ -35,7 +40,11 @@ namespace BallGame.Common
         {
             while (true)
             {
-                string reply = this._wc.DownloadString(this._requestPath);
+                //Thread.Sleep(50);
+                
+
+                // paprasa serverim kas jauns
+                string reply = this._wcIn.DownloadString(this._requestPath);
 
                 if (reply == Constants.EMPTY_VALUE)
                 {
@@ -78,7 +87,7 @@ namespace BallGame.Common
 
         public void Shoot()
         {
-            this._wc.DownloadString(this._requestPath + "&msg=" + Constants.PROTOCOL_I_SHOOT);
+            this._wcOut.DownloadString(this._requestPath + "&msg=" + Constants.PROTOCOL_I_SHOOT);
         }
 
         public void Move(MoveType type)
@@ -86,12 +95,12 @@ namespace BallGame.Common
             // pakustējies pa kreisi
             if (type == MoveType.MoveLeft)
             {
-                this._wc.DownloadString(this._requestPath + "&msg=" + Constants.PROTOCOL_I_MOVE_LEFT);
+                this._wcOut.DownloadString(this._requestPath + "&msg=" + Constants.PROTOCOL_I_MOVE_LEFT);
             }
             // pakustējies pa labi
             if (type == MoveType.MoveRight)
             {
-                this._wc.DownloadString(this._requestPath + "&msg=" + Constants.PROTOCOL_I_MOVE_RIGHT);
+                this._wcOut.DownloadString(this._requestPath + "&msg=" + Constants.PROTOCOL_I_MOVE_RIGHT);
             }
         }
     }

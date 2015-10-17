@@ -10,11 +10,11 @@ namespace BallGame.Common
     {
         public const string EMPTY_VALUE = "nop";
         public const string PROTOCOL_GAME_START = "start";
-        public const string PROTOCOL_I_SHOOT = "ishoot";
-        public const string PROTOCOL_YOU_SHOOT = "youshoot";
-        public const string PROTOCOL_I_MOVE_LEFT = "imoveleft";
-        public const string PROTOCOL_I_MOVE_RIGHT = "imoveright";
-        public const string PROTOCOL_YOU_MOVE_LEFT = "youmoveleft";
-        public const string PROTOCOL_YOU_MOVE_RIGHT = "youmoveright";
+        public const string PROTOCOL_I_SHOOT = "shoot";
+        public const string PROTOCOL_YOU_SHOOT = "shoot";
+        public const string PROTOCOL_I_MOVE_LEFT = "moveleft";
+        public const string PROTOCOL_I_MOVE_RIGHT = "moveright";
+        public const string PROTOCOL_YOU_MOVE_LEFT = "moveleft";
+        public const string PROTOCOL_YOU_MOVE_RIGHT = "moveright";
     }
 }

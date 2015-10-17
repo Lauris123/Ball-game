@@ -22,12 +22,6 @@ namespace BallGameWebserver.Tests
             TestHelper.RunWithWebserver(() => {
                 bool isAborted = false;
 
-                //var wc = new WebClient();
-
-                //string s = wc.DownloadString("http://localhost:20160/spele/?client=1");
-
-                //Assert.AreEqual(s, "nop");
-
                 var comp = new ClientComponent();
 
                 comp.RecievedEmpty += () => {
@@ -36,7 +30,9 @@ namespace BallGameWebserver.Tests
                     return;
                 };
 
-                comp.Connect();
+                //comp.Connect();
+
+                Task.Run(() => comp.Connect());
 
                 while (!isAborted)
                 {
@@ -53,20 +49,108 @@ namespace BallGameWebserver.Tests
         {
             TestHelper.RunWithWebserver(() =>
             {
-                var firstClient = new WebClient();
-                var secondClient = new WebClient();
+                bool isFirstRecieved = false;
+                bool isSecondRecieved = false;
+                bool isFirstGameStart = false;
+                bool isSecondGameStart = false;
 
-                string firstReply = firstClient.DownloadString("http://localhost:20160/spele/?client=1");
-                string secondReply = secondClient.DownloadString("http://localhost:20160/spele/?client=2");
+                var client1 = new ClientComponent();
+                var client2 = new ClientComponent();
 
-                Assert.AreEqual(firstReply, "nop");
-                Assert.AreEqual(secondReply, "nop");
+                client1.RecievedEmpty += () =>
+                {
+                    isFirstRecieved = true;
+                };
 
-                firstReply = firstClient.DownloadString("http://localhost:20160/spele/?client=1");
-                secondReply = secondClient.DownloadString("http://localhost:20160/spele/?client=2");
+                client2.RecievedEmpty += () =>
+                {
+                    isSecondRecieved = true;
+                };
 
-                Assert.AreEqual(firstReply, Constants.PROTOCOL_GAME_START);
-                Assert.AreEqual(secondReply, Constants.PROTOCOL_GAME_START);
+                client1.BeginGame += () => {
+                    isFirstGameStart = true;
+                };
+
+                client2.BeginGame += () =>
+                {
+                    isSecondGameStart = true;
+                };
+
+                Task.Run(() => {
+                    client1.Connect();
+                });
+
+                Task.Run(() =>
+                {
+                    client2.Connect();
+                });
+
+                while (!(isFirstRecieved && isSecondRecieved))
+                {
+                    Thread.Sleep(50);
+                }
+
+                while (!(isFirstGameStart && isSecondGameStart))
+                {
+                    Thread.Sleep(50);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Viens šauj otrs kustās
+        /// </summary>
+        [TestMethod]
+        public void TwoClientsOneMoveOtherShoot()
+        {
+            TestHelper.RunWithWebserver(() =>
+            {
+                bool isFirstRecieved = false;
+                bool isSecondRecieved = false;
+                bool isSecondReviecedEnemyMoved = false;
+
+                var client1 = new ClientComponent();
+                var client2 = new ClientComponent();
+
+                client1.EnemyMove += (moveType) =>
+                {
+                    if (moveType == MoveType.MoveRight)
+                    {
+                        isFirstRecieved = true;
+                    }
+                };
+
+                client2.EnemyShot += () =>
+                {
+                    isSecondRecieved = true;
+                };
+
+                client2.EnemyMove += (moveType) =>
+                {
+                    if (moveType == MoveType.MoveLeft)
+                        isSecondReviecedEnemyMoved = true;
+                };
+
+                Task.Run(() =>
+                {
+                    client1.Connect();
+                    Thread.Sleep(50);
+                    client1.Shoot();
+                    Thread.Sleep(50);
+                    client1.Move(MoveType.MoveLeft);
+                });
+
+                Task.Run(() =>
+                {
+                    client2.Connect();
+                    Thread.Sleep(50);
+                    client2.Move(MoveType.MoveRight);
+                });
+
+                while (!(isFirstRecieved && isSecondRecieved && isSecondReviecedEnemyMoved))
+                {
+                    Thread.Sleep(50);
+                }
             });
         }
     }
