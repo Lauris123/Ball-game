@@ -19,8 +19,12 @@
         <TextBlock Foreground="Blue" FontSize="45" Canvas.Right="500" x:Name="timer"/>
         <TextBlock Foreground="Cyan" FontSize="72" Canvas.Right="10" x:Name="liveCounter"/>
         <TextBlock Foreground="Pink" FontSize="45" Canvas.Right="250" x:Name="TurnTimer"/>
-        <Button x:Name="restart" Foreground="Bisque" Content="Sākt No Sākuma" Background="Black" FontSize="45" Panel.ZIndex="99999999" Click="restart_Click" Visibility="Collapsed" />
-        <TextBlock x:Name="notification" Panel.ZIndex="99999" FontSize="72" Foreground="DarkRed"/>
+        <StackPanel  x:Name="restart"  Visibility="Hidden" Panel.ZIndex="99999">
+            <Button Foreground="Bisque" Content="Sākt No Sākuma" Background="Black" FontSize="45" Panel.ZIndex="99999999"
+                    Click="restart_Click" />
+            <Button Content="Atgriezties uz ēdienkarti" FontSize="45" Background="Bisque" Foreground="Black" Click="returnToMenu"/>
+        </StackPanel>
+        <TextBlock x:Name="notification" Panel.ZIndex="99998" FontSize="72" Foreground="DarkRed"/>
         <Rectangle Loaded="Rectangle_Loaded" Width="200" Height="30"  Canvas.Top="500"  Canvas.Left="10">
             <Rectangle.Fill>
                 <ImageBrush ImageSource="pack://application:,,,/resources/paddle.jpg"/>

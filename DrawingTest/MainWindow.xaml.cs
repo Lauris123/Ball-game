@@ -76,7 +76,11 @@ namespace DrawingTest
         public MainWindow()
         {
             InitializeComponent();
-
+            restart.Loaded += (sender, e) =>
+            {
+                Canvas.SetTop(restart, this.canvas.ActualHeight / 2 - restart.ActualHeight / 2);
+                Canvas.SetLeft(restart, this.canvas.ActualWidth / 2 - restart.ActualWidth / 2);
+            };
             //this.Loaded += MainWindow_Loaded;
         }
 
@@ -126,8 +130,7 @@ namespace DrawingTest
 
             Canvas.SetTop(notification, this.canvas.ActualHeight / 2 - notification.ActualHeight / 2);
 
-            Canvas.SetTop(restart, this.canvas.ActualHeight / 2 - restart.ActualHeight / 2);
-            Canvas.SetLeft(restart, this.canvas.ActualWidth / 2 - restart.ActualWidth / 2);
+            
 
             _startTime = DateTime.Now;
             if (!secondTime)
@@ -153,7 +156,26 @@ namespace DrawingTest
             _gameOver = false;
             _blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
             MainWindow_Loaded(sender, null, true);
+            _firstTime = true;
 
+
+        }
+        private async void returnToMenu(object sender, RoutedEventArgs e)
+        {
+            menuGrid.Visibility = System.Windows.Visibility.Visible;
+            restart.Visibility = System.Windows.Visibility.Hidden;
+            this.ClearTargets();
+            await Task.Delay(25);
+            _startTime = DateTime.Now;
+            _timerStartTime = DateTime.Now;
+            _score = 0;
+            _lives = MAX_LIVE_COUNT;
+            _level = 1;
+            _gameOver = false;
+            _blocksInLevel = BLOCKS_IN_FIRST_LEVEL;
+            MainWindow_Loaded(sender, null, true);
+            _firstTime = true;
+            
         }
 
         #endregion
@@ -320,6 +342,7 @@ namespace DrawingTest
             }
 
         }
+
 
         private async void StartToFuckThePlayer()
         {
