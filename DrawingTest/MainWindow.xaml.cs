@@ -65,6 +65,13 @@ namespace DrawingTest
         Rectangle _rect;
         Rectangle _rect2;
 
+        string[] angerCpoyPastas = {"I am a heron. I have a long neck and I pick fish out of the water with my beak. If you don't play this 10 more times, I will fly into your kitchen tonight and make a mess of your pots and pans.",
+            "Hello, I am currently 15 years old and I want to become a walrus. I know there’s a million people out there just like me, but I promise you I’m different. On December 14th, I’m moving to Antartica; home of the greatest walruses. I’ve already cut off my arms, and now slide on my stomach everywhere I go as training. I may not be a walrus yet, but I promise you if you give me a chance and the support I need, I will become the greatest walrus ever. If you have any questions or maybe advice, just inbox me. Thank you all so much ~~",
+            "Shrek is love. Shrek is life.",
+            "ヽ༼ຈل͜ຈ༽ﾉ raise your dongers ヽ༼ຈل͜ຈ༽ﾉ",
+            "In this moment, are you fucking sorry? Not because, the ass was fat, but because I am euphoric about the fuck that you just fucking said about me, you little bitch.",
+            "I sexually Identify as an Attack Helicopter. Ever since I was a boy I dreamed of soaring over the oilfields dropping hot sticky loads on disgusting foreigners. People say to me that a person being a helicopter is Impossible and I'm fucking retarded but I don't care, I'm beautiful. I'm having a plastic surgeon install rotary blades, 30 mm cannons and AMG-114 Hellfire missiles on my body. From now on I want you guys to call me Apache and respect my right to kill from above and kill needlessly. If you can't accept me you're a heliphobe and need to check your vehicle privilege. Thank you for being so understanding."
+            };
         #endregion
 
         #region Events
@@ -184,15 +191,16 @@ namespace DrawingTest
 
         private async void ShowTimerBrothers()
         {
+            Random r = new Random();
             while (true)
             {
-                timer.Text = (30 - (int)((DateTime.Now - _timerStartTime).TotalSeconds)).ToString();
-
-                if (timer.Text == "0")
+                timer.Text = (10 - (int)((DateTime.Now - _timerStartTime).TotalSeconds)).ToString();
+                if (10 - (int)((DateTime.Now - _timerStartTime).TotalSeconds) == 0)
                 {
-                    MessageBox.Show("I sexually Identify as an Attack Helicopter. Ever since I was a boy I dreamed of soaring over the oilfields dropping hot sticky loads on disgusting foreigners. People say to me that a person being a helicopter is Impossible and I'm fucking retarded but I don't care, I'm beautiful. I'm having a plastic surgeon install rotary blades, 30 mm cannons and AMG-114 Hellfire missiles on my body. From now on I want you guys to call me Apache and respect my right to kill from above and kill needlessly. If you can't accept me you're a heliphobe and need to check your vehicle privilege. Thank you for being so understanding.");
-
+                    MessageBox.Show(angerCpoyPastas[r.Next(0, 5)]);
+                    _timerStartTime = DateTime.Now;
                 }
+                
 
                 await Task.Delay(500);
             }
