@@ -10,7 +10,7 @@ namespace BallGame.Common
 {
     public class ClientComponent : IClientComponent
     {
-        private const string SERVER = "http://192.168.1.42:20160/spele/";
+        private const string SERVER = "http://localhost:20160/spele/";
 
         private readonly string _requestPath;
 

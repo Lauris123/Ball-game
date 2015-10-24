@@ -234,7 +234,7 @@ namespace DrawingTest
                 timer.Text = (10 - (int)((DateTime.Now - _timerStartTime).TotalSeconds)).ToString();
                 if (10 - (int)((DateTime.Now - _timerStartTime).TotalSeconds) == 0)
                 {
-                    //MessageBox.Show(angerCpoyPastas[r.Next(0, 5)]);
+                    MessageBox.Show(angerCpoyPastas[r.Next(0, 5)]);
                     _timerStartTime = DateTime.Now;
                 }
                 
@@ -242,7 +242,7 @@ namespace DrawingTest
                 await Task.Delay(500);
             }
         }
-        //ab
+        
         private async void LimitPlayerTurnTime()
         {
             
@@ -405,6 +405,18 @@ namespace DrawingTest
 
                 _squares[blockNum].Height = size;
                 _squares[blockNum].Width = size;
+
+                bool up = _rnd.Next(0, 2) ==  1 ? true : false;
+                int pixelsMoving = _rnd.Next(0, 50);
+                if(up == false)
+                {
+                    pixelsMoving = 0 - pixelsMoving;
+                }
+                    foreach (var square in _squares)
+                    {
+                        if (Canvas.GetTop(square) + pixelsMoving > 0 && Canvas.GetTop(square) - pixelsMoving > canvas.ActualHeight - 250)    
+                        Canvas.SetTop(square, Canvas.GetTop(square) + pixelsMoving);
+                    }
             }
         }
 
