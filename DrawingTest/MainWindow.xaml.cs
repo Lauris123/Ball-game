@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BallGame.Common;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -38,6 +39,8 @@ namespace DrawingTest
         #endregion
 
         #region Private members
+
+        private ClientComponent _clientComp;
 
         private int _clientNumber;
         PlayerCode _playerNumber = PlayerCode.PlayerOne;
@@ -83,6 +86,9 @@ namespace DrawingTest
         public MainWindow()
         {
             InitializeComponent();
+
+            this._clientComp = new ClientComponent();
+
             restart.Loaded += (sender, e) =>
             {
                 Canvas.SetTop(restart, this.canvas.ActualHeight / 2 - restart.ActualHeight / 2);
@@ -110,10 +116,19 @@ namespace DrawingTest
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e, bool secondTime = false)
         {
+            if (!secondTime)
+            {
+                this._clientComp.Connect();
+            }
+
+            this._clientComp.BeginGame += _clientComp_BeginGame;
+            this._clientComp.EnemyMove += _clientComp_EnemyMove;
+            this._clientComp.EnemyShot += _clientComp_EnemyShot;
+
             if (sender == null)
             {
                 this._clientNumber = _rnd.Next(1, 20000000);
-                this.ListenToServer();
+                //this.ListenToServer();
             }
             if (!secondTime)
             {
@@ -149,9 +164,31 @@ namespace DrawingTest
             }
         }
 
+        void _clientComp_EnemyShot()
+        {
+            Shoot();
+        }
+
+        void _clientComp_EnemyMove(MoveType obj)
+        {
+            if (obj == MoveType.MoveLeft)
+                this.MoveLeft();
+            else
+                this.MoveRight();
+        }
+
+        void _clientComp_BeginGame()
+        {
+            //MessageBox.Show("Pieslēdzas abi spēlētāji!");
+        }
+
         // TODO: parsaukt XAMLā
         private async void restart_Click(object sender, RoutedEventArgs e)
         {
+            this._clientComp.BeginGame -= _clientComp_BeginGame;
+            this._clientComp.EnemyMove -= _clientComp_EnemyMove;
+            this._clientComp.EnemyShot -= _clientComp_EnemyShot;
+
             restart.Visibility = System.Windows.Visibility.Collapsed;
             this.ClearTargets();
             await Task.Delay(25);
@@ -197,7 +234,7 @@ namespace DrawingTest
                 timer.Text = (10 - (int)((DateTime.Now - _timerStartTime).TotalSeconds)).ToString();
                 if (10 - (int)((DateTime.Now - _timerStartTime).TotalSeconds) == 0)
                 {
-                    MessageBox.Show(angerCpoyPastas[r.Next(0, 5)]);
+                    //MessageBox.Show(angerCpoyPastas[r.Next(0, 5)]);
                     _timerStartTime = DateTime.Now;
                 }
                 
@@ -205,7 +242,7 @@ namespace DrawingTest
                 await Task.Delay(500);
             }
         }
-        //a
+        //ab
         private async void LimitPlayerTurnTime()
         {
             
@@ -424,28 +461,15 @@ namespace DrawingTest
         {
             if (e.Key == Key.Left)
             {
-                Canvas.SetLeft(_rect, Canvas.GetLeft(_rect) - 10);
+                this._clientComp.Move(MoveType.MoveLeft);
 
-                if (Canvas.GetLeft(_rect) < 0)
-                {
-                    imageBrush.Viewport = new Rect(imageBrush.Viewport.X - 200, 0, 9000, 600);
-                    //imageBrush.Viewport.Left -= 200.0;
-                }
+                MoveLeft();
             }
             else if (e.Key == Key.Right)
             {
-                WebClient wc = new WebClient();
-                if (this._areWeOnline == true)
-                {
-                    wc.DownloadString("http://localhost:20160/spele/?client=" + this._clientNumber + "&msg=labi");
-                }
-                Canvas.SetLeft(_rect, Canvas.GetLeft(_rect) + 10);
+                this._clientComp.Move(MoveType.MoveRight);
 
-                if (Canvas.GetLeft(_rect) + _rect.Width > this.Width)
-                {
-                    imageBrush.Viewport = new Rect(imageBrush.Viewport.X + 200, 0, 9000, 600);
-                    //imageBrush.Viewport.Left -= 200.0;
-                }
+                MoveRight();
             }
             if (e.Key == Key.A)
             {
@@ -473,32 +497,83 @@ namespace DrawingTest
             //}
             else if (e.Key == Key.Space)
             {
-                
-                if (_firstTime == true)
-                {
-                            
-                    _circle.Visibility = System.Windows.Visibility.Visible;
-                }
-                if(_gameOver == false && Canvas.GetTop(_circle) < 0)
-                {
-                    if (_playerNumber == PlayerCode.PlayerOne)
-                    {
-                        Canvas.SetTop(_circle, Canvas.GetTop(_rect) - _rect.Height + _circle.Height / 2);
-                        Canvas.SetLeft(_circle, Canvas.GetLeft(_rect) + _rect.Width / 2 - _circle.Width / 2);
-                    }
-                    else
-                    {
-                        Canvas.SetTop(_circle, Canvas.GetTop(_rect2) - _rect2.Height + _circle.Height / 2);
-                        Canvas.SetLeft(_circle, Canvas.GetLeft(_rect2) + _rect2. Width / 2 - _circle.Width / 2);
-                    }
-                    _hasTheBallHitASquare = false;
-                    _isLiveTakenAway = false;
-                }
+                this._clientComp.Shoot();
 
-                _firstTime = false;
+                Shoot();
 
                         
             } 
+        }
+
+        private void MoveRight()
+        {
+            WebClient wc = new WebClient();
+            if (this._areWeOnline == true)
+            {
+                wc.DownloadString("http://localhost:20160/spele/?client=" + this._clientNumber + "&msg=labi");
+            }
+            Canvas.SetLeft(_rect, Canvas.GetLeft(_rect) + 10);
+
+            if (Canvas.GetLeft(_rect) + _rect.Width > this.Width)
+            {
+                imageBrush.Viewport = new Rect(imageBrush.Viewport.X + 200, 0, 9000, 600);
+                //imageBrush.Viewport.Left -= 200.0;
+            }
+
+            Canvas.SetLeft(_rect2, Canvas.GetLeft(_rect2) + 10);
+
+            if (Canvas.GetLeft(_rect2) + _rect2.Width > this.Width)
+            {
+                imageBrush.Viewport = new Rect(imageBrush.Viewport.X + 200, 0, 9000, 600);
+                //imageBrush.Viewport.Left -= 200.0;
+            }
+        }
+
+        private void MoveLeft()
+        {
+            
+
+            Canvas.SetLeft(_rect, Canvas.GetLeft(_rect) - 10);
+
+            if (Canvas.GetLeft(_rect) < 0)
+            {
+                imageBrush.Viewport = new Rect(imageBrush.Viewport.X - 200, 0, 9000, 600);
+                //imageBrush.Viewport.Left -= 200.0;
+            }
+
+            Canvas.SetLeft(_rect2, Canvas.GetLeft(_rect2) - 10);
+
+            if (Canvas.GetLeft(_rect2) < 0)
+            {
+                imageBrush.Viewport = new Rect(imageBrush.Viewport.X - 200, 0, 9000, 600);
+                //imageBrush.Viewport.Left -= 200.0;
+            }
+        }
+
+        private void Shoot()
+        {
+            if (_firstTime == true)
+            {
+
+                _circle.Visibility = System.Windows.Visibility.Visible;
+            }
+            if (_gameOver == false && Canvas.GetTop(_circle) < 0)
+            {
+                if (_playerNumber == PlayerCode.PlayerOne)
+                {
+                    Canvas.SetTop(_circle, Canvas.GetTop(_rect) - _rect.Height + _circle.Height / 2);
+                    Canvas.SetLeft(_circle, Canvas.GetLeft(_rect) + _rect.Width / 2 - _circle.Width / 2);
+                }
+                else
+                {
+                    Canvas.SetTop(_circle, Canvas.GetTop(_rect2) - _rect2.Height + _circle.Height / 2);
+                    Canvas.SetLeft(_circle, Canvas.GetLeft(_rect2) + _rect2.Width / 2 - _circle.Width / 2);
+                }
+                _hasTheBallHitASquare = false;
+                _isLiveTakenAway = false;
+            }
+
+            _firstTime = false;
         }
 
         // nokomentēts, jo nav API atbalsts

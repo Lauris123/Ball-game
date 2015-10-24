@@ -48,7 +48,7 @@ namespace MiniWebserver
         {
             PlayerConnected += PlayerConnected_Recieved;
 
-            _ws = new WebServer(SendResponse, "http://localhost:20160/spele/");
+            _ws = new WebServer(SendResponse, "http://192.168.1.42:20160/spele/");
             _ws.Run();
             Console.WriteLine("A simple webserver. Press a key to quit.");
             
